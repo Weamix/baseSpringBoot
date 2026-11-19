@@ -1,9 +1,13 @@
 package com.basespringboot.service;
 import com.basespringboot.entity.Form;
+
+import org.springframework.stereotype.Service;
+
 import com.basespringboot.dto.FormRequest;
 import com.basespringboot.dto.FormResponse;
 import com.basespringboot.repository.FormRepository;
 
+@Service 
 public class FormServiceImpl implements FormService {
 
     private final FormRepository formRepository;
