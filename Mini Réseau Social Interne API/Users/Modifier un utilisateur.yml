@@ -1,0 +1,106 @@
+info:
+  name: Modifier un utilisateur
+  type: http
+  seq: 4
+  tags:
+    - Users
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/api/users{{userId}}"
+  body:
+    type: json
+    data: |-
+      {
+        "username": "theo.duriez",
+        "email": "theo.duriez@company.com",
+        "department": "IT"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 200 Response
+    description: Utilisateur mis à jour
+    request:
+      url: "{{baseUrl}}/api/users/:id"
+      method: PUT
+      params:
+        - name: id
+          value: "1"
+          type: path
+      body:
+        type: json
+        data: |-
+          {
+            "username": "theo.duriez",
+            "email": "theo.duriez@company.com",
+            "department": "IT"
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "id": 1,
+            "username": "theo.duriez",
+            "email": "theo.duriez@company.com",
+            "department": "IT"
+          }
+  - name: 404 Response
+    description: Utilisateur introuvable
+    request:
+      url: "{{baseUrl}}/api/users/:id"
+      method: PUT
+      params:
+        - name: id
+          value: "1"
+          type: path
+      body:
+        type: json
+        data: |-
+          {
+            "username": "theo.duriez",
+            "email": "theo.duriez@company.com",
+            "department": "IT"
+          }
+    response:
+      status: 404
+      statusText: Not Found
+      body:
+        type: text
+        data: ""
+  - name: 409 Response
+    description: Email déjà utilisé par un autre utilisateur
+    request:
+      url: "{{baseUrl}}/api/users/:id"
+      method: PUT
+      params:
+        - name: id
+          value: "1"
+          type: path
+      body:
+        type: json
+        data: |-
+          {
+            "username": "theo.duriez",
+            "email": "theo.duriez@company.com",
+            "department": "IT"
+          }
+    response:
+      status: 409
+      statusText: Conflict
+      body:
+        type: text
+        data: ""

@@ -1,0 +1,274 @@
+openapi: 3.0.3
+info:
+  title: Mini Réseau Social Interne API
+  description: API REST Spring Boot de gestion des utilisateurs et des publications
+  version: 1.0.0
+servers:
+  - url: http://localhost:8084
+    description: Serveur local Spring Boot
+tags:
+  - name: Users
+    description: Gestion des utilisateurs
+  - name: Posts
+    description: Gestion des publications
+paths:
+  /api/users:
+    get:
+      tags: [Users]
+      summary: Lister tous les utilisateurs (avec filtre optionnel par département)
+      parameters:
+        - name: department
+          in: query
+          required: false
+          schema:
+            type: string
+          example: IT
+      responses:
+        '200':
+          description: Liste des utilisateurs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+    post:
+      tags: [Users]
+      summary: Créer un utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+            example:
+              username: theo.duriez
+              email: theo.duriez@company.com
+              department: IT
+      responses:
+        '201':
+          description: Utilisateur créé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Requête invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Email déjà utilisé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/users/{id}:
+    get:
+      tags: [Users]
+      summary: Récupérer un utilisateur par son ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          example: 1
+      responses:
+        '200':
+          description: Utilisateur trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: Utilisateur introuvable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags: [Users]
+      summary: Modifier un utilisateur
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '200':
+          description: Utilisateur mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: Utilisateur introuvable
+        '409':
+          description: Email déjà utilisé par un autre utilisateur
+    delete:
+      tags: [Users]
+      summary: Supprimer un utilisateur
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          example: 1
+      responses:
+        '204':
+          description: Utilisateur supprimé
+        '404':
+          description: Utilisateur introuvable
+
+  /api/posts:
+    get:
+      tags: [Posts]
+      summary: Récupérer la liste des posts
+      responses:
+        '200':
+          description: Tableau JSON des posts avec l'auteur imbriqué
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PostResponse'
+    post:
+      tags: [Posts]
+      summary: Créer un post lié à un utilisateur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+            examples:
+              creationValide:
+                summary: Création valide (201)
+                value:
+                  content: Premier post de test !
+                  userId: 1
+              auteurInexistant:
+                summary: Utilisateur inexistant (404)
+                value:
+                  content: Test erreur
+                  userId: 999
+      responses:
+        '201':
+          description: Post créé avec l'objet author imbriqué
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostResponse'
+        '404':
+          description: Auteur introuvable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                timestamp: '2026-11-20T17:00:00.000Z'
+                status: 404
+                error: Author not found
+
+  /api/posts/{id}:
+    delete:
+      tags: [Posts]
+      summary: Supprimer un post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          example: 1
+      responses:
+        '204':
+          description: Post supprimé
+        '404':
+          description: Post introuvable
+
+components:
+  schemas:
+    UserRequest:
+      type: object
+      required: [username, email, department]
+      properties:
+        username:
+          type: string
+          example: theo.duriez
+        email:
+          type: string
+          format: email
+          example: theo.duriez@company.com
+        department:
+          type: string
+          example: IT
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        username:
+          type: string
+          example: theo.duriez
+        email:
+          type: string
+          example: theo.duriez@company.com
+        department:
+          type: string
+          example: IT
+    PostRequest:
+      type: object
+      required: [content, userId]
+      properties:
+        content:
+          type: string
+          example: Premier post de test !
+        userId:
+          type: integer
+          format: int64
+          example: 1
+    PostResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        content:
+          type: string
+          example: Premier post de test !
+        author:
+          $ref: '#/components/schemas/UserResponse'
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: '2026-11-20T17:00:00.000Z'
+        status:
+          type: integer
+          example: 404
+        error:
+          type: string
+          example: Author not found

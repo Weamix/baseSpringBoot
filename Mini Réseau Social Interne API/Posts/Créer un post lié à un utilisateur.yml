@@ -1,0 +1,150 @@
+info:
+  name: Créer un post lié à un utilisateur
+  type: http
+  seq: 2
+  tags:
+    - Posts
+
+http:
+  method: POST
+  url: http://localhost:8084/api/posts
+  body:
+    type: json
+    data: |-
+      {
+        "content": "Premier post de test !",
+        "userId": {{userId}}
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Création post 201 avec author imbriqué", function () {
+          expect(res.getStatus()).to.equal(201);
+          expect(res.getBody().author).to.be.an("object");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 201 Response (Création valide (201))
+    description: Post créé avec l'objet author imbriqué
+    request:
+      url: "{{baseUrl}}/api/posts"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "content": "Premier post de test !",
+            "userId": 1
+          }
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "id": 1,
+            "content": "Premier post de test !",
+            "author": {
+              "id": 1,
+              "username": "theo.duriez",
+              "email": "theo.duriez@company.com",
+              "department": "IT"
+            }
+          }
+  - name: 201 Response (Utilisateur inexistant (404))
+    description: Post créé avec l'objet author imbriqué
+    request:
+      url: "{{baseUrl}}/api/posts"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "content": "Test erreur",
+            "userId": 999
+          }
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "id": 1,
+            "content": "Premier post de test !",
+            "author": {
+              "id": 1,
+              "username": "theo.duriez",
+              "email": "theo.duriez@company.com",
+              "department": "IT"
+            }
+          }
+  - name: 404 Response (Création valide (201))
+    description: Auteur introuvable
+    request:
+      url: "{{baseUrl}}/api/posts"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "content": "Premier post de test !",
+            "userId": 1
+          }
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "timestamp": "2026-11-20T17:00:00.000Z",
+            "status": 404,
+            "error": "Author not found"
+          }
+  - name: 404 Response (Utilisateur inexistant (404))
+    description: Auteur introuvable
+    request:
+      url: "{{baseUrl}}/api/posts"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "content": "Test erreur",
+            "userId": 999
+          }
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "timestamp": "2026-11-20T17:00:00.000Z",
+            "status": 404,
+            "error": "Author not found"
+          }

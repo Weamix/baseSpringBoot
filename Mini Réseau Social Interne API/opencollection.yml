@@ -1,0 +1,30 @@
+opencollection: 1.0.0
+
+info:
+  name: Mini Réseau Social Interne API
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  variables:
+    - name: baseUrl
+      value: http://localhost:8084
+
+docs:
+  content: API REST Spring Boot de gestion des utilisateurs et des publications
+  type: text/markdown
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

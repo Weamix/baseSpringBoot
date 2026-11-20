@@ -1,0 +1,54 @@
+info:
+  name: Supprimer un post
+  type: http
+  seq: 3
+  tags:
+    - Posts
+
+http:
+  method: DELETE
+  url: "{{baseUrl}}/api/posts/:id"
+  params:
+    - name: id
+      value: "1"
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 204 Response
+    description: Post supprimé
+    request:
+      url: "{{baseUrl}}/api/posts/:id"
+      method: DELETE
+      params:
+        - name: id
+          value: "1"
+          type: path
+    response:
+      status: 204
+      statusText: No Content
+      body:
+        type: text
+        data: ""
+  - name: 404 Response
+    description: Post introuvable
+    request:
+      url: "{{baseUrl}}/api/posts/:id"
+      method: DELETE
+      params:
+        - name: id
+          value: "1"
+          type: path
+    response:
+      status: 404
+      statusText: Not Found
+      body:
+        type: text
+        data: ""

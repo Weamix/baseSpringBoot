@@ -1,0 +1,55 @@
+info:
+  name: Récupérer la liste des posts
+  type: http
+  seq: 1
+  tags:
+    - Posts
+
+http:
+  method: GET
+  url: http://localhost:8084/api/posts
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("Liste des posts 200", function () {
+          expect(res.getStatus()).to.equal(200);
+          expect(res.getBody()).to.be.an("array");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 200 Response
+    description: Tableau JSON des posts avec l'auteur imbriqué
+    request:
+      url: "{{baseUrl}}/api/posts"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          [
+            {
+              "id": 1,
+              "content": "Premier post de test !",
+              "author": {
+                "id": 1,
+                "username": "theo.duriez",
+                "email": "theo.duriez@company.com",
+                "department": "IT"
+              }
+            }
+          ]

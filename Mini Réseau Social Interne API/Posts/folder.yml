@@ -1,0 +1,11 @@
+info:
+  name: Posts
+  type: folder
+  seq: 2
+
+request:
+  auth: inherit
+
+docs:
+  content: Gestion des publications
+  type: text/markdown

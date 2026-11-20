@@ -1,0 +1,67 @@
+info:
+  name: Récupérer un utilisateur par son ID
+  type: http
+  seq: 3
+  tags:
+    - Users
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/users{{userId}}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 200 Response
+    description: Utilisateur trouvé
+    request:
+      url: "{{baseUrl}}/api/users/:id"
+      method: GET
+      params:
+        - name: id
+          value: "1"
+          type: path
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "id": 1,
+            "username": "theo.duriez",
+            "email": "theo.duriez@company.com",
+            "department": "IT"
+          }
+  - name: 404 Response
+    description: Utilisateur introuvable
+    request:
+      url: "{{baseUrl}}/api/users/:id"
+      method: GET
+      params:
+        - name: id
+          value: "1"
+          type: path
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "timestamp": "2026-11-20T17:00:00.000Z",
+            "status": 404,
+            "error": "Author not found"
+          }

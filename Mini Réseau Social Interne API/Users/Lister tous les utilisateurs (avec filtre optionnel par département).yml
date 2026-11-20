@@ -1,0 +1,50 @@
+info:
+  name: Lister tous les utilisateurs (avec filtre optionnel par département)
+  type: http
+  seq: 1
+  tags:
+    - Users
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/users"
+  params:
+    - name: department
+      value: IT
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 200 Response
+    description: Liste des utilisateurs
+    request:
+      url: "{{baseUrl}}/api/users"
+      method: GET
+      params:
+        - name: department
+          value: IT
+          type: query
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          [
+            {
+              "id": 1,
+              "username": "theo.duriez",
+              "email": "theo.duriez@company.com",
+              "department": "IT"
+            }
+          ]

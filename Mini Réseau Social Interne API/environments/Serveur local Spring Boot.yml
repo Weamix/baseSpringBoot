@@ -1,0 +1,4 @@
+name: Serveur local Spring Boot
+variables:
+  - name: baseUrl
+    value: http://localhost:8084

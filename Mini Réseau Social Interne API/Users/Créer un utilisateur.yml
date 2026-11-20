@@ -1,0 +1,121 @@
+info:
+  name: Créer un utilisateur
+  type: http
+  seq: 2
+  tags:
+    - Users
+
+http:
+  method: POST
+  url: http://localhost:8084/api/users
+  body:
+    type: json
+    data: |-
+      {
+        "username": "theo.duriez",
+        "email": "theo.{{$timestamp}}@company.com",
+        "department": "IT"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: bru.setVar("userId", res.getBody().id);
+    - type: tests
+      code: |-
+        test("Création utilisateur 201 avec ID", function () {
+          expect(res.getStatus()).to.equal(201);
+          expect(res.getBody().id).to.be.a("number");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
+
+examples:
+  - name: 201 Response
+    description: Utilisateur créé
+    request:
+      url: "{{baseUrl}}/api/users"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "username": "theo.duriez",
+            "email": "theo.duriez@company.com",
+            "department": "IT"
+          }
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "id": 1,
+            "username": "theo.duriez",
+            "email": "theo.duriez@company.com",
+            "department": "IT"
+          }
+  - name: 400 Response
+    description: Requête invalide
+    request:
+      url: "{{baseUrl}}/api/users"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "username": "theo.duriez",
+            "email": "theo.duriez@company.com",
+            "department": "IT"
+          }
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "timestamp": "2026-11-20T17:00:00.000Z",
+            "status": 404,
+            "error": "Author not found"
+          }
+  - name: 409 Response
+    description: Email déjà utilisé
+    request:
+      url: "{{baseUrl}}/api/users"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "username": "theo.duriez",
+            "email": "theo.duriez@company.com",
+            "department": "IT"
+          }
+    response:
+      status: 409
+      statusText: Conflict
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "timestamp": "2026-11-20T17:00:00.000Z",
+            "status": 404,
+            "error": "Author not found"
+          }
